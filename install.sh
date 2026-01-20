@@ -14,7 +14,7 @@ if [ -d ~/.dotfiles ]; then
     mv ~/.dotfiles ~/.dotfiles.backup.$(date +%Y%m%d_%H%M%S)
 fi
 
-git clone git@github.com:alainseys/dotfiles.git .dotfiles
+git clone git@github.com:alainseys/dotfile.git .dotfiles
 
 # 2. Install dependencies
 echo "📦 Installing dependencies..."
