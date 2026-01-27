@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# THIS SCRIPT ADDS NEW CONFIGS
 set -e
 
 source "$(dirname "$0")/lib.sh"
