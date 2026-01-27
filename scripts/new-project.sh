@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Ask the user for the location of the new project
+read -rp "Enter the full path for the new project: " PROJECT
+
+# Check if the path is provided
+if [ -z "$PROJECT" ]; then
+    echo "No path provided. Exiting."
+    exit 1
+fi
+
+# Create the project and .devcontainer directories if they don't exist
+mkdir -p "$PROJECT/.devcontainer"
+
+# Copy the devcontainer.json
+if [ -f ~/.dotfiles/configs/devcontainer/devcontainer.json ]; then
+    cp ~/.dotfiles/configs/devcontainer/devcontainer.json "$PROJECT/.devcontainer/devcontainer.json"
+    echo "Copied devcontainer.json"
+else
+    echo "Warning: devcontainer.json not found in ~/.dotfiles/configs/devcontainer/"
+fi
+
+# Copy the Dockerfile
+if [ -f ~/.dotfiles/configs/devcontainer/Dockerfile ]; then
+    cp ~/.dotfiles/configs/devcontainer/Dockerfile "$PROJECT/.devcontainer/Dockerfile"
+    echo "Copied Dockerfile"
+else
+    echo "Warning: Dockerfile not found in ~/.dotfiles/configs/devcontainer/"
+fi
+
+# Copy the requirements.txt
+if [ -f ~/.dotfiles/configs/devcontainer/requirements.txt ]; then
+    cp ~/.dotfiles/configs/devcontainer/requirements.txt "$PROJECT/requirements.txt"
+    echo "Copied requirements.txt"
+else
+    echo "Warning: requirements.txt not found in ~/.dotfiles/configs/devcontainer/"
+fi
+
+# Copy the requirements.yml
+if [ -f ~/.dotfiles/configs/devcontainer/requirements.yml ]; then
+    cp ~/.dotfiles/configs/devcontainer/requirements.yml "$PROJECT/requirements.txt"
+    echo "Copied requirements.yml"
+else
+    echo "Warning: requirements.yml not found in ~/.dotfiles/configs/devcontainer/"
+fi
+
+
+echo "Initialization complete!"
