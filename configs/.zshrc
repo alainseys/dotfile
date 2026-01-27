@@ -10,7 +10,9 @@ ssh-add -l &>/dev/null || ssh-add ~/.ssh/alainseys_HP_HCD4097VMK_private_openssh
 #===============================================================================
 # FUNCTIONS
 # =============================================================================
-
+addfile(){
+ ~/.dotfiles/scripts/add.sh "$1"
+}
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
