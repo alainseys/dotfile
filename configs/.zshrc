@@ -1,3 +1,8 @@
+# Enable Powerlevel10k instant prompt.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -5,7 +10,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 # App Images Location (need to exists)
 export PATH="$HOME/Application:$PATH"
-ZSH_THEME="agnoster"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 ssh-add -l &>/dev/null || ssh-add ~/.ssh/alainseys_HP_HCD4097VMK_private_openssh
 #===============================================================================
 # FUNCTIONS
@@ -94,4 +99,10 @@ alias start-veeam="sudo veeam"
 alias new-project="$HOME/.dotfiles/scripts/new-project.sh"
 alias dotcommit='cd $HOME/.dotfiles && git add -A && git commit -m "Update dotfiles: $(date)" && git push'
 #====================================================
+# Powerlevel
+#===================================================
+source ~/powerlevel10k/powerlevel10k.zsh-theme
+source ~/powerlevel10k/powerlevel10k.zsh-theme
 
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
