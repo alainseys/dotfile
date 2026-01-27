@@ -96,3 +96,4 @@ alias mount-veeam-disk="sudo mount -t exfat -o rw,uid=0,gid=0,umask=022 /dev/sda
 alias unmount-veeam-disk="sudo umount -l /dev/sda1"
 alias start-veeam="sudo veeam"
 alias new-project="$HOME/.dotfiles/scripts/new-project.sh"
+alias dotcommit='cd $HOME/.dotfiles && git add -A && git commit -m "Update dotfiles: $(date)" && git push'
