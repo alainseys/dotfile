@@ -58,6 +58,7 @@ source $ZSH/oh-my-zsh.sh
 # export ARCHFLAGS="-arch $(uname -m)"
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
+
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
 # users are encouraged to define aliases within a top-level file in
 # the $ZSH_CUSTOM folder, with .zsh extension. Examples:
@@ -68,6 +69,16 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+# ==============================================
+# PRIVATE ALIASES (NOT SYNCED)
+# =============================================
+PRIVATE_ALIASES="$HOME/.zshrc.private"
+if [[ -f "$PRIVATE_ALIASES" ]]; then
+	source "$PRIVATE_ALIASES"
+else
+	echo "Private aliased file not found $PRIVATE_ALIASES"
+fi
+
 #===============================================
 # ALIASSES
 #===============================================
