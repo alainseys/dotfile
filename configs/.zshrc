@@ -87,7 +87,8 @@ source $ZSH/oh-my-zsh.sh
 #===============================================
 # ALIASSES
 #===============================================
-# ALAIN TEST
+alias watchconfig="$HOME/.dotfiles/scripts/watch-configs.sh"
+alias cato="$HOME/.dotfiles/scripts/sdp.sh"
 alias obsidian="/opt/Obsidian-1.11.4.AppImage "
 alias mount-veeam-disk="sudo mount -t exfat -o rw,uid=0,gid=0,umask=022 /dev/sda1 /mnt/BackupDisk"
 alias unmount-veeam-disk="sudo umount -l /dev/sda1"
