@@ -82,6 +82,7 @@ fi
 #===============================================
 # ALIASSES
 #===============================================
+alias edit-private-alias="vi ~/.zshrc.private"
 alias edit-zsh="vi ~/.zshrc"
 alias update-zsh="source ~/.zshrc"
 alias watchconfig="$HOME/.dotfiles/scripts/watch-configs.sh"
