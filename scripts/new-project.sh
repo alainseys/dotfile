@@ -38,11 +38,24 @@ fi
 
 # Copy the requirements.yml
 if [ -f ~/.dotfiles/configs/devcontainer/requirements.yml ]; then
-    cp ~/.dotfiles/configs/devcontainer/requirements.yml "$PROJECT/requirements.txt"
+    cp ~/.dotfiles/configs/devcontainer/requirements.yml "$PROJECT/requirements.yml"
     echo "Copied requirements.yml"
 else
     echo "Warning: requirements.yml not found in ~/.dotfiles/configs/devcontainer/"
 fi
-
+# Copy private_key
+if [ -f ~/.dotfiles/certs/private_key ]; then
+    cp ~/.dotfiles/certs/private_key "$PROJECT/private_key"
+    echo "Copied private_key"
+else
+    echo "Warning: private_key not found in ~/.dotfiles/certs"
+fi
+# Copy CatoNetworksTrustedRootCA
+if [ -f ~/.dotfiles/certs/CatoNetworksTrustedRootCA.pem ]; then
+    cp ~/.dotfiles/certs/CatoNetworksTrustedRootCA.pem "$PROJECT/CatoNetworksTrustedRootCA.pem"
+    echo "Copied CatoNetworksTrustedRootCA.pem"
+else
+    echo "Warning: CatoNetworksTrustedRootCA.pem not found in ~/.dotfiles/certs"
+fi
 
 echo "Initialization complete!"
