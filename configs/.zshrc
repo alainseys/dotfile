@@ -100,6 +100,7 @@ alias unmount-veeam-disk="sudo umount -l /dev/sda1"
 alias start-veeam="sudo veeam"
 alias new-project="$HOME/.dotfiles/scripts/new-project.sh"
 alias dotcommit='cd $HOME/.dotfiles && git add -A && git commit -m "Update dotfiles: $(date)" && git push'
+alias dotadd="/home/aseys/.dotfiles/scripts/add.sh"
 alias vim="nvim"
 #====================================================
 # Powerlevel
