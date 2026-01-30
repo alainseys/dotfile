@@ -13,35 +13,35 @@ fi
 mkdir -p "$PROJECT/.devcontainer"
 
 # Copy the devcontainer.json
-if [ -f ~/.dotfiles/configs/devcontainer/devcontainer.json ]; then
-    cp ~/.dotfiles/configs/devcontainer/devcontainer.json "$PROJECT/.devcontainer/devcontainer.json"
+if [ -f ~/.dotfiles/configs/devcontainer/linux/devcontainer.json ]; then
+    cp ~/.dotfiles/configs/devcontainer/linux/devcontainer.json "$PROJECT/.devcontainer/devcontainer.json"
     echo "Copied devcontainer.json"
 else
-    echo "Warning: devcontainer.json not found in ~/.dotfiles/configs/devcontainer/"
+    echo "Warning: devcontainer.json not found in ~/.dotfiles/configs/devcontainer/linux/"
 fi
 
 # Copy the Dockerfile
-if [ -f ~/.dotfiles/configs/devcontainer/Dockerfile ]; then
-    cp ~/.dotfiles/configs/devcontainer/Dockerfile "$PROJECT/.devcontainer/Dockerfile"
+if [ -f ~/.dotfiles/configs/devcontainer/linux/Dockerfile ]; then
+    cp ~/.dotfiles/configs/devcontainer/linux/Dockerfile "$PROJECT/.devcontainer/Dockerfile"
     echo "Copied Dockerfile"
 else
-    echo "Warning: Dockerfile not found in ~/.dotfiles/configs/devcontainer/"
+    echo "Warning: Dockerfile not found in ~/.dotfiles/configs/devcontainer/linux/"
 fi
 
 # Copy the requirements.txt
-if [ -f ~/.dotfiles/configs/devcontainer/requirements.txt ]; then
-    cp ~/.dotfiles/configs/devcontainer/requirements.txt "$PROJECT/requirements.txt"
+if [ -f ~/.dotfiles/configs/devcontainer/linux/requirements.txt ]; then
+    cp ~/.dotfiles/configs/devcontainer/linux/requirements.txt "$PROJECT/requirements.txt"
     echo "Copied requirements.txt"
 else
-    echo "Warning: requirements.txt not found in ~/.dotfiles/configs/devcontainer/"
+    echo "Warning: requirements.txt not found in ~/.dotfiles/configs/devcontainer/linux/"
 fi
 
 # Copy the requirements.yml
-if [ -f ~/.dotfiles/configs/devcontainer/requirements.yml ]; then
-    cp ~/.dotfiles/configs/devcontainer/requirements.yml "$PROJECT/requirements.yml"
+if [ -f ~/.dotfiles/configs/devcontainer/linux/requirements.yml ]; then
+    cp ~/.dotfiles/configs/devcontainer/linux/requirements.yml "$PROJECT/requirements.yml"
     echo "Copied requirements.yml"
 else
-    echo "Warning: requirements.yml not found in ~/.dotfiles/configs/devcontainer/"
+    echo "Warning: requirements.yml not found in ~/.dotfiles/configs/devcontainer/linux/"
 fi
 # Copy private_key
 if [ -f ~/.dotfiles/certs/private_key ]; then
