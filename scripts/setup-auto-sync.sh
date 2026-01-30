@@ -5,7 +5,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT_DIR="$REPO_ROOT/scripts"
 CONFIG_DIR="$REPO_ROOT/configs"
 WATCHER="$SCRIPT_DIR/watch-configs.sh"
-CONFIG_FILE="$SCRIPT_DIR/watch-configs.conf"
+CONFIG_FILE="$REPO_ROOT/scripts/watch-configs.conf"
 SERVICE_DIR="$HOME/.config/systemd/user"
 SERVICE_FILE="$SERVICE_DIR/dotfiles-watcher.service"
 
