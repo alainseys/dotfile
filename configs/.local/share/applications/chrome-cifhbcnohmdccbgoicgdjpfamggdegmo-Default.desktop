@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=Microsoft Teams (PWA)
+MimeType=x-scheme-handler/web+msteams;x-scheme-handler/google-chrome;
+Exec=/opt/google/chrome/google-chrome --profile-directory=Default --app-id=cifhbcnohmdccbgoicgdjpfamggdegmo %U
+Icon=/home/aseys/.dotfile/icons/icons8-microsoft-teams-48.png
+StartupWMClass=crx_cifhbcnohmdccbgoicgdjpfamggdegmo
