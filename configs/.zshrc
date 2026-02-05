@@ -2,7 +2,7 @@
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-
+#
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -94,16 +94,17 @@ alias update-zsh="source ~/.zshrc"
 alias watchconfig="$HOME/.dotfile/scripts/watch-configs.sh"
 alias cato="$HOME/.dotfile/scripts/sdp.sh"
 alias obsidian="/opt/Obsidian-1.11.4.AppImage "
-#alias mount-veeam-disk="sudo mount -t exfat -o rw,uid=0,gid=0,umask=022 /dev/sda1 /mnt/BackupDisk"
-#alias unmount-veeam-disk="sudo umount -l /dev/sda1"
+alias umount-veeam-disk="sudo umount -l /mnt/WDBACKUP"
+alias mount-veeam-disk="sudo mount -a"
 alias start-veeam="sudo veeam"
 alias new-project="$HOME/.dotfile/scripts/new-project.sh"
 alias dotcommit='cd $HOME/.dotfile && git add -A && git commit -m "Update dotfiles: $(date)" && git push'
+alias dotadd="$HOME/.dotfile/scripts/add.sh"
 #====================================================
 # Powerlevel
 #===================================================
-source ~/powerlevel10k/powerlevel10k.zsh-theme
-source ~/powerlevel10k/powerlevel10k.zsh-theme
+source $HOME/.oh-my-zsh/custom/themes/powerlevel10k
+source $HOME/.oh-my-zsh/custom/themes/powerlevel10k
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
