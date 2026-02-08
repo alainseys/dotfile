@@ -100,6 +100,12 @@ alias start-veeam="sudo veeam"
 alias new-project="$HOME/.dotfile/scripts/new-project.sh"
 alias dotcommit='cd $HOME/.dotfile && git add -A && git commit -m "Update dotfiles: $(date)" && git push'
 alias dotadd="$HOME/.dotfile/scripts/add.sh"
+#test
+#==================================================
+# Appimage Applications
+# ================================================
+alias obsidian="~/.Applicaitions/Obsidian-1.11.7.AppImage"
+
 #====================================================
 # Powerlevel
 #===================================================
