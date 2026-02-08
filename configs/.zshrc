@@ -93,7 +93,7 @@ alias edit-zsh="vi ~/.zshrc"
 alias update-zsh="source ~/.zshrc"
 alias watchconfig="$HOME/.dotfile/scripts/watch-configs.sh"
 alias cato="$HOME/.dotfile/scripts/sdp.sh"
-alias obsidian="/opt/Obsidian-1.11.4.AppImage "
+
 alias umount-veeam-disk="sudo umount -l /mnt/WDBACKUP"
 alias mount-veeam-disk="sudo mount -a"
 alias start-veeam="sudo veeam"
@@ -104,7 +104,7 @@ alias dotadd="$HOME/.dotfile/scripts/add.sh"
 #==================================================
 # Appimage Applications
 # ================================================
-alias obsidian="~/.Applicaitions/Obsidian-1.11.7.AppImage"
+alias obsidian="~/.Applications/Obsidian-1.11.7.AppImage"
 
 #====================================================
 # Powerlevel
