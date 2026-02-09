@@ -101,7 +101,9 @@ alias new-project="$HOME/.dotfile/scripts/new-project.sh"
 alias dotcommit='cd $HOME/.dotfile && git add -A && git commit -m "Update dotfiles: $(date)" && git push'
 alias dotadd="$HOME/.dotfile/scripts/add.sh"
 alias update-note='cd $HOME/Documents/Notes && git add . && git commit -m  "Update Docfiles: $(date)" && git push' 
-#test
+alias gpg-list='gpg --list-secret-keys --keyid-format LONG'
+alias gpg-gitlab='git config --global user.signingkey 6A6812EBA520D0F9'
+alias gpg-github='git config --global user.signingkey 2846045C47F967A4'
 #==================================================
 # Appimage Applications
 # ================================================
