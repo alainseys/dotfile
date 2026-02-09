@@ -1,0 +1,51 @@
+- name: Installation and configuration of laptop
+  host: localhost
+  gather_facts: false
+  tasks:
+    - name: Install zsh
+      ansible.builtin.dnf:
+        name: zsh
+        state: present
+
+    - name: Install ohmyzsh
+      ansible.builtin.shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+      args:
+        creates: ~/.oh-my-zsh
+
+    - name: Install powerlevel10k
+      ansible.builtin.git:
+        repo: https://github.com/romkatv/powerlevel10k.git
+        dest: ~/.oh-my-zsh/custom/themes/powerlevel10k
+
+    - name: Install visual studio code
+      ansible.builtin.dnf:
+        name: code
+        state: present
+      register: vscode_install
+
+    - name: Install docker
+      ansible.builtin.dnf:
+        name: docker
+        state: present
+      register: docker_install
+
+    - name: Create docker group
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Add user aseys to docker group
+      ansible.builtin.user:
+        name: aseys
+        groups: docker
+        append: yes
+
+    - name: Download obsidian flatpak and place in ~/.Applications
+      ansible.builtin.get_url:
+        url: https://github.com/obsidianmd/obsidian-releases/releases/download/v1.11.7/Obsidian-1.11.7.AppImage
+        dest: ~/.Applications/Obsidian-1.11.7.AppImage
+
+    - name: Make obsidian flatpak executable
+      ansible.builtin.file:
+        path: ~/.Applications/Obsidian-1.11.7.AppImage
+        mode: '0755'
