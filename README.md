@@ -4,7 +4,7 @@ This repo is created to store my laptop configurations, so i can verry fast rest
 ## Installation
 On Windows i use WSL make sure you clone the repository in the correct directory ($HOME/.dotfiles), otherwise the script will not work!
 On Linux the same applies the directory should be inside your home folder as above.
-
+#
 ## Prequisties
 - copy private ssh key to ~/.ssh (if no ssh folder run ssh-keygen)
 - copy ssh config to ~/.ssh and define your git providers with your ssh key
