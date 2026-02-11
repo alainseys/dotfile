@@ -1,0 +1,56 @@
+- name: Installation and configuration of laptop
+  hosts: localhost
+  vars:
+    ansible_user: aseys
+  gather_facts: true
+  tasks:
+
+    - name: Stop and disable Docker
+      ansible.builtin.service:
+        name: docker
+        state: stopped
+        enabled: false
+      become: true
+      ignore_errors: true
+
+    - name: Remove Docker packages
+      ansible.builtin.dnf:
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: absent
+      become: true
+      ignore_errors: true
+
+    - name: Remove Docker data
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /var/lib/docker
+        - /var/lib/containerd
+        - /etc/docker
+      become: true
+
+    - name: Remove Docker group
+      ansible.builtin.group:
+        name: docker
+        state: absent
+      become: true
+      ignore_errors: true
+
+    - name: Remove Docker CE repository
+      ansible.builtin.file:
+        path: /etc/yum.repos.d/docker-ce.repo
+        state: absent
+      become: true
+      ignore_errors: true
