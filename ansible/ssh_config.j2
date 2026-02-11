@@ -1,0 +1,10 @@
+Host ans-gitlab-01.vanmarcke.be
+    Hostname ans-gitlab-01.vanmarcke.be
+    User {{ ssh_user }}
+    IdentityFile {{ ssh_key_path }}
+
+Host github.com
+    Hostname github.com
+    User git
+    IdentityFile {{ ssh_key_path }}
+    PreferredAuthentications publickey

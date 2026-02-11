@@ -1,51 +1,167 @@
 - name: Installation and configuration of laptop
-  host: localhost
-  gather_facts: false
+  hosts: localhost
+  vars:
+    ansible_user: aseys
+    teamviewer_download_location: https://download.teamviewer.com/download/linux/teamviewer.x86_64.rpm?_gl=1*1tkvn83*_gcl_au*MTY3NTI5NDE1LjE3NzA3OTgzOTM.
+    teamviewer_download_dest: "/tmp/teamviewer.x86_64.rpm"
+    vnc_download_location: https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.15.1-Linux-x64.rpm
+    vcn_download_test: "/tmp/VNC-Viewer-7.15.1-Linux-x64.rpm"
+    remoted_download_location: "https://cdn.devolutions.net/download/Linux/RDM/2025.3.2.2/RemoteDesktopManager_2025.3.2.2_x86_64.rpm"
+    remoted_download_test: "/tmp/RemoteDesktopManager_2025.3.2.2_x86_64.rpm"
+  gather_facts: true
   tasks:
-    - name: Install zsh
+
+    - name: Install zsh and other utils
       ansible.builtin.dnf:
-        name: zsh
+        name:
+          - git
+          - util-linux-user
+          - zsh
         state: present
+      become: true
 
-    - name: Install ohmyzsh
-      ansible.builtin.shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-      args:
-        creates: ~/.oh-my-zsh
+    - name: Ensure .ssh directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME}}/.ssh"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0700'
+      become: true
 
-    - name: Install powerlevel10k
+    - name: Clone dotfile repo
       ansible.builtin.git:
-        repo: https://github.com/romkatv/powerlevel10k.git
-        dest: ~/.oh-my-zsh/custom/themes/powerlevel10k
+        repo: git@github.com:alainseys/dotfile.git
+        dest: "{{ ansible_env.HOME}}/.dotfile"
+        version: main
+        update: true
+      become: false
+
+    - name: Install visual studio code
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://packages.microsoft.com/keys/microsoft.asc
+      become: true
+        
+    - name: Add visual studio code repository
+      ansible.builtin.yum_repository:
+        name: vscode
+        description: Visual Studio Code
+        baseurl: https://packages.microsoft.com/yumrepos/vscode
+        enabled: true
+        gpgcheck: true
+        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+      become: true
 
     - name: Install visual studio code
       ansible.builtin.dnf:
         name: code
         state: present
-      register: vscode_install
+      become: true
 
-    - name: Install docker
+    - name: Install required dependencies
       ansible.builtin.dnf:
-        name: docker
+        name:
+          - dnf-plugins-core
         state: present
-      register: docker_install
+      become: true
 
-    - name: Create docker group
-      ansible.builtin.group:
-        name: docker
-        state: present
-
-    - name: Add user aseys to docker group
-      ansible.builtin.user:
-        name: aseys
-        groups: docker
-        append: yes
+    - name: Ensure ~/.Applications exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.Applications"
+        state: directory
+        mode: '0755'
+      become: false
 
     - name: Download obsidian flatpak and place in ~/.Applications
       ansible.builtin.get_url:
         url: https://github.com/obsidianmd/obsidian-releases/releases/download/v1.11.7/Obsidian-1.11.7.AppImage
         dest: ~/.Applications/Obsidian-1.11.7.AppImage
+      become: false
 
     - name: Make obsidian flatpak executable
       ansible.builtin.file:
         path: ~/.Applications/Obsidian-1.11.7.AppImage
         mode: '0755'
+
+
+    - name: Install oh My zsh
+      ansible.builtin.shell: |
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+      args:
+        creates: /home/{{ ansible_user}}/.oh-my-zsh
+
+    - name: Copy zshrc to home
+      ansible.builtin.copy:
+        src: "{{ ansible_env.HOME}}/.dotfile/configs/.zshrc"
+        dest: "{{ ansible_env.HOME}}/.zshrc"
+        backup: true
+      become: false
+      
+    - name: Ensure EPEL repository is enabled
+      ansible.builtin.package:
+        name: epel-release
+        state: present
+      become: true
+
+    - name: Install Podmman
+      ansible.builtin.package:
+        name: podman
+        state: present
+      become: true
+
+    - name: Enable and start Podman socket service
+      ansible.builtin.systemd:
+        name: podman.socket
+        enabled: yes
+        state: started
+      become: true
+
+    - name: Verify podman Installation
+      ansible.builtin.command: podman --version
+      register: podman_version
+      changed_when: false
+
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "Podman version installed: {{ podman_version.stdout }}"
+
+    - name: Download teamviewer RPM
+      ansible.builtin.get_url:
+        url: "{{ teamviewer_download_location }}"
+        dest: "{{ teamviewer_download_dest }}"
+        mode: '0644'
+
+    - name: Install teamviewer package
+      ansible.builtin.dnf:
+        name: "{{ teamviewer_download_dest }}"
+        state: present
+        disable_gpg_check: true
+      become: true
+
+    - name: Download VNC viewer RPM
+      ansible.builtin.get_url:
+        url: "{{ vnc_download_location }}"
+        dest: "{{ vcn_download_test }}"
+        mode: '0644'
+
+    - name: Install VNC viewer
+      ansible.builtin.dnf:
+        name: "{{ vnc_download_location }}"
+        state: present
+        disable_gpg_check: true
+      become: true
+
+    - name: Download Remote Desktop Manager
+      ansible.builtin.get_url:
+        url: "{{ remoted_download_location }}"
+        dest: "{{ remoted_download_test }}"
+        mode: '0644'
+
+    - name: Install Remote Dekstop Manager
+      ansible.builtin.dnf:
+        name: "{{ remoted_download_location }}"
+        state: present
+        disable_gpg_check: true
+      become: true
+
