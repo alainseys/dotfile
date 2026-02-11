@@ -2,6 +2,8 @@
   hosts: localhost
   vars:
     ansible_user: aseys
+    ssh_user: alain.seys
+    ssh_key_path: /home/{{ ansible_user }}/lainseys_HP_HCD4097VMK_private_openssh
     teamviewer_download_location: https://download.teamviewer.com/download/linux/teamviewer.x86_64.rpm?_gl=1*1tkvn83*_gcl_au*MTY3NTI5NDE1LjE3NzA3OTgzOTM.
     teamviewer_download_dest: "/tmp/teamviewer.x86_64.rpm"
     vnc_download_location: https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.15.1-Linux-x64.rpm
@@ -20,6 +22,16 @@
         state: present
       become: true
 
+    - name: Deploy SSH config
+      ansible.builtin.template:
+        src: ssh_config.j2
+        dest: "/home/{{ ansible_user }}/.ssh"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'
+      become: true
+
+
     - name: Ensure .ssh directory exists
       ansible.builtin.file:
         path: "{{ ansible_env.HOME}}/.ssh"
@@ -29,13 +41,19 @@
         mode: '0700'
       become: true
 
+    - name: Check if dotfile repo exists
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.dotfile"
+      register: dotfile_repo
+
     - name: Clone dotfile repo
       ansible.builtin.git:
         repo: git@github.com:alainseys/dotfile.git
-        dest: "{{ ansible_env.HOME}}/.dotfile"
+        dest: "{{ ansible_env.HOME }}/.dotfile"
         version: main
-        update: true
+        update: false
       become: false
+      when: not dotfile_repo.stat.exists
 
     - name: Install visual studio code
       ansible.builtin.rpm_key:
@@ -97,6 +115,18 @@
         dest: "{{ ansible_env.HOME}}/.zshrc"
         backup: true
       become: false
+
+    - name: Clone Powerlevel10k repository
+      ansible.builtin.git:
+        repo: https://github.com/romkatv/powerlevel10k.git
+        dest: "{{ ansible_env.HOME }}/.powerlevel10k"
+        version: master
+        update: yes
+        force: yes
+        accept_hostkey: yes
+      become_user: "{{ ansible_user }}"
+      become: true
+
       
     - name: Ensure EPEL repository is enabled
       ansible.builtin.package:
