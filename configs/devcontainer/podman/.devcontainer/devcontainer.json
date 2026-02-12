@@ -1,0 +1,45 @@
+{
+  "name": "ansible-dev-container-podman",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "containerUser": "vscode",
+  "remoteUser": "vscode",
+  "runArgs": [
+    "--cap-add=CAP_MKNOD",
+    "--cap-add=NET_ADMIN",
+    "--cap-add=SYS_ADMIN",
+    "--cap-add=SYS_RESOURCE",
+    "--device", "/dev/fuse",
+    "--security-opt", "seccomp=unconfined",
+    "--security-opt", "label=disable",
+    "--security-opt", "apparmor=unconfined",
+    "--userns=keep-id",
+    "--hostname=ansible-dev-container",
+    "--add-host=host.docker.internal:host-gateway",
+     // GPG socket forwarding
+    "-v", "/run/user/1000/gnupg:/run/user/1000/gnupg:ro",
+    "-e", "GNUPGHOME=/run/user/1000/gnupg"
+  ],
+  "mounts": [
+    "source=/run/user/1000/podman/podman.sock,target=/run/user/1000/podman/podman.sock,type=bind",
+    "source=/run/user/1000/podman/podman.sock,target=/var/run/docker.sock,type=bind",
+    "source=/run/user/1000/gnupg,target=/run/user/1000/gnupg,type=bind,readonly"
+  ],
+  "remoteEnv": {
+    "DOCKER_HOST": "unix:///run/user/1000/podman/podman.sock",
+    "PODMAN_USERNS": "keep-id",
+    "GPG_TTY": "/dev/pts/0",
+    "GNUPGHOME": "/run/user/1000/gnupg"
+  },
+ "postCreateCommand": "sudo chown -R vscode:vscode /workspaces && git config --global --add safe.directory '*' && git config pull.rebase true && ansible-galaxy collection install -r requirements.yml --force",  "customizations": {
+    "vscode": {
+      "extensions": [
+        "redhat.ansible",
+        "ms-azuretools.vscode-docker",
+        "oderwat.indent-rainbow"
+      ]
+    }
+  }
+}

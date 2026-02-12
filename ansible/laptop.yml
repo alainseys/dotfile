@@ -10,6 +10,10 @@
     vcn_download_test: "/tmp/VNC-Viewer-7.15.1-Linux-x64.rpm"
     remoted_download_location: "https://cdn.devolutions.net/download/Linux/RDM/2025.3.2.2/RemoteDesktopManager_2025.3.2.2_x86_64.rpm"
     remoted_download_test: "/tmp/RemoteDesktopManager_2025.3.2.2_x86_64.rpm"
+    vscodium_download_location: "https://github.com/VSCodium/vscodium/releases/download/1.109.21026/codium-1.109.21026-el8.x86_64.rpm"
+    vcdodium_download_dest: "/tmp/codium-1.109.21026-el8.x86_64.rpm"
+    user_id: 1000
+    docker_host: "unix:///run/user/1000/podman/podman.sock"
   gather_facts: true
   tasks:
 
@@ -54,28 +58,6 @@
         update: false
       become: false
       when: not dotfile_repo.stat.exists
-
-    - name: Install visual studio code
-      ansible.builtin.rpm_key:
-        state: present
-        key: https://packages.microsoft.com/keys/microsoft.asc
-      become: true
-        
-    - name: Add visual studio code repository
-      ansible.builtin.yum_repository:
-        name: vscode
-        description: Visual Studio Code
-        baseurl: https://packages.microsoft.com/yumrepos/vscode
-        enabled: true
-        gpgcheck: true
-        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
-      become: true
-
-    - name: Install visual studio code
-      ansible.builtin.dnf:
-        name: code
-        state: present
-      become: true
 
     - name: Install required dependencies
       ansible.builtin.dnf:
@@ -152,6 +134,56 @@
       register: podman_version
       changed_when: false
 
+    - name: Install podman-compose
+      ansible.builtin.dnf:
+        name: podman-compose
+        state: present
+      become: true
+
+    - name: Install podman-docker(provides docker CLI compatibility)
+      ansible.builtin.dnf:
+        name: podman-docker
+        state: present
+      become: true
+
+    - name: Stop and disable rootfull docker.socket
+      ansible.builtin.systemd:
+        name: podman.socket
+        enabled: false
+        state: stopped
+      become: true
+
+    - name: Ensure rootless podman socket is enabled and started
+      ansible.builtin.systemd:
+        name: podman.socket
+        scope: user
+        enabled: true
+        state: started
+      become: true
+
+    - name: Wait a few seconds for the socket to be fully up and running
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Check rootless podman.socket status
+      become: false
+      ansible.builtin.command: systemctl --user status podman.socket
+      register: podman_status
+      ignore_errors: yes
+
+    - name: Set DOCKER_HOST environment variable for Zsh
+      ansible.builtin.lineinfile:
+        path: "/home/{{ ansible_user }}/.zshrc"
+        line: "export DOCKER_HOST={{ docker_host }}"
+        create: yes
+        state: present
+        insertafter: EOF
+      become: false
+
+    - name: Show podman.socket status
+      debug:
+        var: podman_status.stdout_lines
+
     - name: Debug
       ansible.builtin.debug:
         msg: "Podman version installed: {{ podman_version.stdout }}"
@@ -159,6 +191,21 @@
     - name: Gather installed packages facts
       ansible.builtin.package_facts:
         manager: auto
+
+    - name: Download vscodium
+      ansible.builtin.get_url:
+        url: "{{ vscodium_download_location }}"
+        dest: "{{ vcdodium_download_dest }}"
+        mode: '0644'
+      when: "'vscodium' not in ansible_facts.packages"
+
+    - name: Install vscodium
+      ansible.builtin.dnf:
+        name: "{{ vscodium_download_location }}"
+        state: present
+        disable_gpg_check: true
+      become: true
+      when: "'vscodium' not in ansible_facts.packages"
 
     - name: Download teamviewer RPM
       ansible.builtin.get_url:
