@@ -109,6 +109,7 @@ alias update-note='cd $HOME/Documents/Notes && git add . && git commit -m  "Upda
 alias gpg-list='gpg --list-secret-keys --keyid-format LONG'
 alias gpg-gitlab='git config --global user.signingkey 6A6812EBA520D0F9'
 alias gpg-github='git config --global user.signingkey 2846045C47F967A4'
+alias git-submodules="git submodule update --init --recursive"
 #==================================================
 # Appimage Applications
 # ================================================
