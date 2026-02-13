@@ -84,7 +84,12 @@ if [[ -f "$PRIVATE_ALIASES" ]]; then
 else
 	echo "Private aliased file not found $PRIVATE_ALIASES"
 fi
-
+#===============================================
+# HISTORY
+# ==============================================
+export HISTSIZE=10000
+export SAVEHIST=10000
+setopt SHARE_HISTORY
 #===============================================
 # ALIASSES
 #===============================================
@@ -117,3 +122,4 @@ source $HOME/.oh-my-zsh/custom/themes/powerlevel10k
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
