@@ -1,68 +1,81 @@
 FROM python:3.11.13-bullseye
 
-COPY CatoNetworksTrustedRootCA.cer /usr/local/share/ca-certificates/CatoNetworksTrustedRootCA.cer
-RUN apt-get update && apt-get install -y ca-certificates openssl && \
-    if openssl x509 -in /usr/local/share/ca-certificates/CatoNetworksTrustedRootCA.cer -inform DER -noout 2>/dev/null; then \
-        openssl x509 -inform DER -in /usr/local/share/ca-certificates/CatoNetworksTrustedRootCA.cer \
-                     -out /usr/local/share/ca-certificates/CatoNetworksTrustedRootCA.crt; \
+# Avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ---- Create non-root user matching host UID/GID ----
+ARG USERNAME=ansible
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+RUN groupadd --gid ${USER_GID} ${USERNAME} \
+    && useradd --uid ${USER_UID} --gid ${USER_GID} -m -s /bin/bash ${USERNAME}
+
+# ---- Install required system packages (single layer) ----
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    openssl \
+    git \
+    curl \
+    sshpass \
+    bash-completion \
+    less \
+    gnupg \
+    lsb-release \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- Add custom CA if needed ----
+COPY CatoNetworksTrustedRootCA.cer /tmp/CatoNetworksTrustedRootCA.cer
+RUN if openssl x509 -in /tmp/CatoNetworksTrustedRootCA.cer -inform DER -noout 2>/dev/null; then \
+        openssl x509 -inform DER \
+            -in /tmp/CatoNetworksTrustedRootCA.cer \
+            -out /usr/local/share/ca-certificates/CatoNetworksTrustedRootCA.crt; \
     else \
-        cp /usr/local/share/ca-certificates/CatoNetworksTrustedRootCA.cer \
+        cp /tmp/CatoNetworksTrustedRootCA.cer \
            /usr/local/share/ca-certificates/CatoNetworksTrustedRootCA.crt; \
     fi && \
-    rm -f /usr/local/share/ca-certificates/CatoNetworksTrustedRootCA.cer && \
-    update-ca-certificates
+    update-ca-certificates && \
+    rm -f /tmp/CatoNetworksTrustedRootCA.cer
 
-# Set the workspace enviroment variable Worspace
-ENV WORKSPACE_BASE_PATH=/workspaces/ansible
-
-# Copy the private key into the image
-COPY ../private_key ${WORKSPACE_BASE_PATH}/private_key
-RUN chmod 600 ${WORKSPACE_BASE_PATH}/private_key
-RUN echo "eval \$(ssh-agent -s)" >> /etc/bash.bashrc && \
-    echo "ssh-add ${WORKSPACE_BASE_PATH}/private_key" >> /etc/bash.bashrc
-
-
-# Install sshpass
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends sshpass
-
-RUN echo 'SSHD: ALL' >> /etc/hosts.allow
-
-# Upgrade pip and install necessary Python packages
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip install ansible ansible-lint ansible-dev-tools ansible-builder ansible-creator ansible-navigator pywinrm molecule pyVmomi requests \
-    docker netmiko yamllint dnspython pytest-molecule podman
-
-
-
-# Set up bash aliases and environment variables
-RUN echo "alias ansible-update='git push origin HEAD:main'" >> /etc/bash.bashrc
-#RUN echo "alias apply-template=${WORKSPACE_BASE_PATH}/scripts/copy-template.sh" >> /etc/bash.bashrc
-RUN echo "export ANSIBLE_CONFIG=${WORKSPACE_BASE_PATH}/ansible.cfg" >> /etc/bash.bashrc
-RUN echo "alias ansible-submodules='${WORKSPACE_BASE_PATH}/scripts/ansible-submodules.sh'" >> /etc/bash.bashrc
-
-
-# Docker specs to use with molecule
-RUN apt-get update && \
-    apt-get install -y apt-transport-https ca-certificates curl gnupg-agent less software-properties-common && \
-    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" && \
-    apt-get update && \
-    apt-get install -y docker-ce-cli && \
-    apt-get clean && \
+# ---- Install Docker CLI only (no daemon) ----
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg && \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bullseye stable" \
+    > /etc/apt/sources.list.d/docker.list && \
+    apt-get update && apt-get install -y --no-install-recommends docker-ce-cli && \
     rm -rf /var/lib/apt/lists/*
 
-# Kerberos requirements
-#RUN apt-get update && \ 
-#    apt-get install gcc -y \
-#    python3-dev \
-#    libkrb5-dev \
-#    gss-ntlmssp
-RUN git config --global user.email "alain.seys@outlook.com"
-RUN git config --global user.name "Alain Seys"
-COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# ---- Python config (allow user pip installs safely) ----
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PATH="/home/${USERNAME}/.local/bin:${PATH}"
 
-# Change Back to correct workdir
+# ---- Install Ansible & tooling system-wide (clean base layer) ----
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install \
+        ansible \
+        ansible-lint \
+        ansible-dev-tools \
+        ansible-builder \
+        ansible-creator \
+        ansible-navigator \
+        pywinrm \
+        molecule \
+        pyVmomi \
+        requests \
+        docker \
+        netmiko \
+        yamllint \
+        dnspython \
+        pytest-molecule
+
+# ---- Enable bash completion & git completion ----
+RUN echo "if [ -f /etc/bash_completion ]; then . /etc/bash_completion; fi" >> /etc/bash.bashrc
+
+# ---- Workspace ----
+ENV WORKSPACE_BASE_PATH=/workspaces/ansible
+RUN mkdir -p ${WORKSPACE_BASE_PATH} \
+    && chown -R ${USERNAME}:${USERNAME} ${WORKSPACE_BASE_PATH}
+
+# ---- Switch to non-root user ----
+USER ${USERNAME}
 WORKDIR ${WORKSPACE_BASE_PATH}
