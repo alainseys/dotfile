@@ -1,7 +1,7 @@
 #!/bin/bash
 BASEDIR=$HOME/.dotfile
 # Ask the user for the location of the new project
-read -rp "Enter the full path for the new project: " PROJECT
+read -rp "Enter the full path for the new project: (/home/$USER/Documents...)" PROJECT
 
 # Check if the path is provided
 if [ -z "$PROJECT" ]; then
@@ -59,3 +59,4 @@ else
 fi
 
 echo "Initialization complete!"
+cd "$PROJECT" || exit
