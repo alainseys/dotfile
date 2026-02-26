@@ -90,6 +90,7 @@ fi
 export HISTSIZE=10000
 export SAVEHIST=10000
 setopt SHARE_HISTORY
+HISTFILE=~/.cache/zsh/history
 #===============================================
 # ALIASSES
 #===============================================
@@ -124,3 +125,18 @@ source $HOME/.oh-my-zsh/custom/themes/powerlevel10k
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
+if [[ -n "$SSH_CONNECTION" ]]; then
+    print -Pn "\e]0;REMOTE: %m\a"
+fi
+#======================================================
+autoload -Uz add-zsh-hook
+
+ssh_prompt_prefix() {
+  if [[ -n "$SSH_CONNECTION" ]]; then
+    echo "%F{red}[REMOTE]%f "
+  fi
+}
+
+add-zsh-hook precmd () {
+  PS1="$(ssh_prompt_prefix)${PS1}"
+}

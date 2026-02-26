@@ -20,18 +20,18 @@ all:
         PACKETFENCE-01: {}
 
     # Uncomment this section when you have Windows hosts ready
-    # windows:
-    #   vars:
-    #     ansible_user: VM\ansible
-    #     ansible_password: PASSWORD_HERE
-    #     ansible_connection: winrm
-    #     ansible_winrm_transport: ntlm
-    #     ansible_port: 5986
-    #     ansible_winrm_scheme: https
-    #     ansible_winrm_server_cert_validation: ignore
-    #     become: true
-    #     become_method: runas
-    #     become_user: VM\ansible
-    #   hosts:
-    #     APP-SIGMACONSO-01:
-    #       ansible_host: 172.27.246.81
+    windows:
+      vars:
+        ansible_user: VM\ansible
+        ansible_password: esD5aZ8MAvg9u3Yy
+        ansible_connection: winrm
+        ansible_winrm_transport: ntlm
+        ansible_port: 5986
+        ansible_winrm_scheme: https
+        ansible_winrm_server_cert_validation: ignore
+        become: true
+        become_method: runas
+        become_user: VM\ansible
+      hosts:
+        VMAPI-DEV:
+          ansible_host: 172.27.246.7
