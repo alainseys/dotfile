@@ -1,29 +1,32 @@
 {
-  "name": "ansible-dev-container-secure",
+  "name": "ansible-dev-container-podman",
   "build": {
     "context": "..",
-    "dockerfile": "Dockerfile",
-    "args": {
-      "USER_UID": "1000",
-      "USER_GID": "1000"
-    }
+    "dockerfile": "Dockerfile"
   },
-
-  "containerUser": "ansible",
-  "remoteUser": "ansible",
-
+  "containerUser": "root",
   "runArgs": [
-    "--hostname=ansible-dev-container"
+    "--cap-add=CAP_MKNOD",
+    "--cap-add=NET_ADMIN",
+    "--cap-add=SYS_ADMIN",
+    "--cap-add=SYS_RESOURCE",
+    "--device", "/dev/fuse",
+    "--security-opt", "seccomp=unconfined",
+    "--security-opt", "label=disable",
+    "--security-opt", "apparmor=unconfined",
+    "--userns=host",
+    "--hostname=ansible-dev-container",
+    "--add-host=host.docker.internal:host-gateway"
   ],
 
-  "mounts": [
-    "source=${env:HOME}/.ssh,target=/home/ansible/.ssh,type=bind,consistency=cached",
-    "source=/run/user/1000/podman/podman.sock,target=/var/run/docker.sock,type=bind"
-  ],
+  // THIS IS THE ONLY THING THAT MATTERS
+ // "mounts": [
+ //   "source=/run/user/1000/podman/podman.sock,target=/var/run/docker.sock,type=bind"
+//  ],
 
+  // THIS MUST BE THE UNIX SOCKET — NOT TCP!
   "remoteEnv": {
-    "DOCKER_HOST": "unix:///var/run/docker.sock",
-    "PODMAN_USERNS": "keep-id"
+    "DOCKER_HOST": "unix:///var/run/docker.sock"
   },
 
   "postCreateCommand": "git config --global --add safe.directory '*' && git config pull.rebase true",
@@ -33,7 +36,9 @@
       "extensions": [
         "redhat.ansible",
         "ms-azuretools.vscode-docker",
-        "oderwat.indent-rainbow"
+        "oderwat.indent-rainbow",
+        "cweijan.vscode-postgresql-client2"
+        // … your other extensions
       ]
     }
   }
