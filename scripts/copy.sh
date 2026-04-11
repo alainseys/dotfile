@@ -4,11 +4,9 @@
 CERT_FILE="$HOME/.dotfile/certs/CatoNetworksTrustedRootCA.pem"
 KEY_FILE="$HOME/.dotfile/certs/private_key"
 
-# Ask user for destination directory
-read -rp "Enter destination directory: " DEST_DIR
 
 # Expand ~ if used
-DEST_DIR="${DEST_DIR/#\~/$HOME}"
+DEST_DIR="$PWD"
 
 # Check if destination exists
 if [ ! -d "$DEST_DIR" ]; then
